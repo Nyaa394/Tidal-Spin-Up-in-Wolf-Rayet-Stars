@@ -1,4 +1,7 @@
-#### The purpose of this project is to verify different conditions to see under which a WR star can efficiently be spun up by tides to achieve high-spinning BH remnants. <br>
+### Purpose
+The purpose of this project is to verify different conditions to see under which a WR star can efficiently be spun up by tides to achieve high-spinning BH remnants. <br>
+
+### Contents overview
 - The code itself is based on a series of tasks given to me as worksheets, with the functions, ODE_solver and plot_utils files being intended for future, unrelated use as well. <br>
 - The MAIN and main_worksheet files are trial files which will not be updated regularly, but the calculations written in them may be reused.<br>
 - main_condition_checker is intended to output a table into a separate file with all initial data that fullfils the condition(s) currently being verified.<br>
