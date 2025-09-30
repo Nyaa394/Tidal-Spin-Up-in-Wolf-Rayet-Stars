@@ -17,15 +17,15 @@ with open("possible_output.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
     writer.writerow(["m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
-                     'tidal function timescale (years)', 'initial frequency f0 (Hz)', 'f_final (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)'])
+                     'tidal function timescale (years)', 'initial frequency f0 (Hz)', 'f_final (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)', 'spin parameter a_spin'])
 
     # shit just got real
-    for m1 in [random.uniform(10*Msolar, 100*Msolar) for _ in range(10)]:
-        for m2 in [random.uniform(20*Msolar, 100*Msolar) for _ in range(10)]:
+    for m1 in [random.uniform(10*Msolar, 100*Msolar) for _ in range(100)]:
+        for m2 in [random.uniform(20*Msolar, 100*Msolar) for _ in range(100)]:
             for rg2 in [0.1]:
                 for k in [0.001]:
                     for Q in [1e4, 1e5, 1e6, 1e7]:
-                        for lifetime in [1000, 5000, 10000, 1e5]:
+                        for lifetime in [1000, 5000, 10000, 1e5, 1e6]:
                             q = m1/m2
 
                             RWR1 = fct.radius_from_mass(
@@ -83,4 +83,4 @@ with open("possible_output.csv", "w", newline="") as f:
                                         if a_spin >= 0.3:
                                             # Write one row for this iteration
                                             writer.writerow(
-                                                [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J])
+                                                [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J, a_spin])
