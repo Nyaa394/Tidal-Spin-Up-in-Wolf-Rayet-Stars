@@ -49,26 +49,26 @@ with open("possible_output.csv", "w", newline="") as f:
                             tfinal = lifetime*365.25*24*3600  # time in s
 
                             # checking timescales compared to lifetime, timescale has to be shorter for tides to have time to act
+                            for a0 in [2*a_min_si, 3*a_min_si, 4*a_min_si, 5*a_min_si]:
+                                f0 = fct.gw_frequency(a0, m1, m2)
 
-                            T_TF = fct.tidal_friction_timescale(
-                                m1, m2, Q, k, a_min_si, RWR1, fmin)/(3600*24*365.25)
-                            if T_TF <= lifetime:
+                                T_TF = fct.tidal_friction_timescale(
+                                    m1, m2, Q, k, a0, RWR1, f0)/(3600*24*365.25)
+                                if T_TF <= lifetime:  # timescale will only decrease so if the initial one is smaller then all of them are
 
-                                # and now I die
+                                    # and now I die
 
-                                K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
-                                    ((G**(5/3))*m1*rg2*(m1+m2)**(5/3))
-                                K2 = (3*k/Q)*((m2**2)*(np.pi**3)*(R1**3)) / \
-                                    (G*m1*rg2*(m1+m2)**2)
+                                    K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
+                                        ((G**(5/3))*m1*rg2*(m1+m2)**(5/3))
+                                    K2 = (3*k/Q)*((m2**2)*(np.pi**3)*(R1**3)) / \
+                                        (G*m1*rg2*(m1+m2)**2)
 
-                                def dfdt(f, Omega):
-                                    return K1*(f**(13/3))*(f/2-Omega)
+                                    def dfdt(f, Omega):
+                                        return K1*(f**(13/3))*(f/2-Omega)
 
-                                def dOmegadt(f, Omega):
-                                    return K2*(f**3)*(f/2-Omega)
+                                    def dOmegadt(f, Omega):
+                                        return K2*(f**3)*(f/2-Omega)
 
-                                for a0 in [2*a_min_si, 3*a_min_si, 4*a_min_si, 5*a_min_si]:
-                                    f0 = fct.gw_frequency(a0, m1, m2)
                                     for Omega0 in [1e-5]:
                                         sols = odes.solve_Radau(
                                             dxdt=dfdt, dydt=dOmegadt, x0=f0, y0=Omega0, t0=0, tfinal=tfinal, x_scale=1, y_scale=1, t_scale=1)
