@@ -17,7 +17,7 @@ with open("possible_output.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
     writer.writerow(["m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
-                     'tidal function timescale (years)', 'initial frequency f0 (Hz)', 'f_final (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)', 'spin parameter a_spin'])
+                     'tidal function timescale (years)', 'initial frequency f0 (Hz)', 'f_final (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)', 'spin parameter a_spin', 'final separation a_final (m)', 'minimum separation a_min (m)'])
 
     # shit just got real
     for m1 in [random.uniform(10*Msolar, 100*Msolar) for _ in range(100)]:
@@ -79,6 +79,9 @@ with open("possible_output.csv", "w", newline="") as f:
                                         Omega = sols[2]  # in Hz
                                         J = rg2*m1*(R1**2)*Omega[-1]
                                         a_spin = c*J/(G*m1*m1)
+                                        a_final = fct.separation_from_gw_frequency(
+                                            # final separation in m
+                                            f[-1], m1, m2)
 
                                         if f[-1] <= fmin:
                                             # maybe add condition about final timescalre and/or final a
@@ -86,4 +89,4 @@ with open("possible_output.csv", "w", newline="") as f:
                                             if a_spin >= 0.38:
                                                 # Write one row for this iteration
                                                 writer.writerow(
-                                                    [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J, a_spin])
+                                                    [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J, a_spin, a_final, a_min_si])

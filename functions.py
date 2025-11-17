@@ -41,6 +41,13 @@ def gw_frequency(a, m1, m2):
     G = 6.674e-11  # N*m^2/Kg^2
     return (1/np.pi)*((G*(m1+m2))/(a**3))**(1/2)  # in Hz
 
+# separation from gravitational wave frequency
+
+def separation_from_gw_frequency(f, m1, m2):
+    import numpy as np
+    G = 6.674e-11  # N*m^2/Kg^2
+    return ((G*(m1+m2))/(np.pi**2*f**2))**(1/3)  # in m
+
 # tidal friction timescale + integrable version for quad
 
 
