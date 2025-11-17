@@ -55,7 +55,7 @@ with open("possible_output.csv", "w", newline="") as f:
                                 T_TF = fct.tidal_friction_timescale(
                                     m1, m2, Q, k, a0, RWR1, f0)/(3600*24*365.25)
 
-                                if T_TF <= lifetime:  # timescale will only decrease so if the initial one is smaller then all of them are
+                                if T_TF <= lifetime:  # assume if it's bigger then it has no hope
                                     # and now I die
 
                                     K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
@@ -80,7 +80,10 @@ with open("possible_output.csv", "w", newline="") as f:
                                         J = rg2*m1*(R1**2)*Omega[-1]
                                         a_spin = c*J/(G*m1*m1)
 
-                                        if a_spin >= 0.3:
-                                            # Write one row for this iteration
-                                            writer.writerow(
-                                                [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J, a_spin])
+                                        if f[-1] <= fmin:
+                                            # maybe add condition about final timescalre and/or final a
+
+                                            if a_spin >= 0.38:
+                                                # Write one row for this iteration
+                                                writer.writerow(
+                                                    [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J, a_spin])
