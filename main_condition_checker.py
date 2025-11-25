@@ -7,17 +7,20 @@ import ODE_solver as odes
 import numpy as np
 import random
 import csv
+import os
+os.makedirs("solutions", exist_ok=True)
 G = 6.674e-11  # N*m^2/Kg^2
 Msolar = 1.989e30  # kg
 Rsolar = 6.957e8  # in m
 c = 299792458.0  # m/s
+counter = 0
 
 # Open the outputfile once, before loops
 with open("possible_output.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
-    writer.writerow(["m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
-                     'tidal function timescale (years)', 'initial frequency f0 (Hz)', 'f_final (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)', 'spin parameter a_spin', 'final separation a_final (m)', 'minimum separation a_min (m)'])
+    writer.writerow(["ID", "m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
+                     'tidal function timescale (years)', 'initial frequency f0 (Hz)', 'f_final (Hz)', 'f_min (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)', 'spin parameter a_spin', 'final separation a_final (m)', 'minimum separation a_min (m)'])
 
     # shit just got real
     for m1 in [random.uniform(10*Msolar, 100*Msolar) for _ in range(100)]:
@@ -55,8 +58,7 @@ with open("possible_output.csv", "w", newline="") as f:
                                 T_TF = fct.tidal_friction_timescale(
                                     m1, m2, Q, k, a0, RWR1, f0)/(3600*24*365.25)
 
-                                if T_TF <= lifetime:  # assume if it's bigger then it has no hope
-                                    # and now I die
+                                if T_TF <= 10*lifetime:  # assume if it's bigger then it has no hope
 
                                     K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
                                         ((G**(5/3))*m1*rg2*(m1+m2)**(5/3))
@@ -77,16 +79,22 @@ with open("possible_output.csv", "w", newline="") as f:
                                         t = sols[0]/(3600*24*365.25)
                                         f = sols[1]  # in Hz
                                         Omega = sols[2]  # in Hz
+
                                         J = rg2*m1*(R1**2)*Omega[-1]
                                         a_spin = c*J/(G*m1*m1)
                                         a_final = fct.separation_from_gw_frequency(
                                             # final separation in m
                                             f[-1], m1, m2)
 
-                                        if f[-1] <= fmin:
+                                        if f[-1] <= 2*fmin:
                                             # maybe add condition about final timescalre and/or final a
 
                                             if a_spin >= 0.38:
+                                                sol_id = f"sol_{counter:05d}"
+                                                np.savez(
+                                                    f"solutions/{sol_id}.npz", t=t, f=f, Omega=Omega)
+                                                counter += 1
+
                                                 # Write one row for this iteration
                                                 writer.writerow(
-                                                    [m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], Omega[-1], J, a_spin, a_final, a_min_si])
+                                                    [sol_id, m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], fmin, Omega[-1], J, a_spin, a_final, a_min_si])
