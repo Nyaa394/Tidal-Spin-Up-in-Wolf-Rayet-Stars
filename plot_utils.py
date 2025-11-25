@@ -71,6 +71,74 @@ def plot2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=None,
             pl.legend(legend)
     pl.show()
 
+   # THIS IS STILL JUST COPIED FROM NORMAL PLOT2D FUNCTION, NEEDS TO BE CHANGED TO CONTOUR PLOT
+
+
+def plot2d_contour(x, y, Z, contour=True, levels=20, cmap='viridis', xlabel=None, ylabel=None, title=None, legend=None, xlim=None, ylim=None, axis_font=None, axis_size=None, title_font=None, title_size=None, legend_size=None, grid=None, grid_axis='both', grid_color=None, grid_linestyle='-', grid_linewidth=None, grid_transparency=1):
+    X, Y = np.meshgrid(x, y)
+    if contour:
+        cs = pl.contourf(X, Y, Z, levels=levels, cmap=cmap)
+    else:
+        cs = pl.pcolormesh(X, Y, Z, shading='auto', cmap=cmap)
+    pl.colorbar(cs)
+
+    if xlim is not None:
+        pl.xlim(xlim)
+    if ylim is not None:
+        pl.ylim(ylim)
+
+    if grid is not None:
+        if grid_color is not None:
+            if grid_linewidth is not None:
+                pl.grid(axis=grid_axis, color=grid_color, linestyle=grid_linestyle,
+                        linewidth=grid_linewidth, alpha=grid_transparency)
+            else:
+                pl.grid(axis=grid_axis, color=grid_color,
+                        linestyle=grid_linestyle, alpha=grid_transparency)
+        elif grid_linewidth is not None:
+            pl.grid(axis=grid_axis, linestyle=grid_linestyle,
+                    linewidth=grid_linewidth, alpha=grid_transparency)
+
+    if xlabel is not None:
+        if axis_font is not None:
+            if axis_size is not None:
+                pl.xlabel(xlabel, fontname=axis_font, fontsize=axis_size)
+            else:
+                pl.xlabel(xlabel, fontname=axis_font)
+        elif axis_size is not None:
+            pl.xlabel(xlabel, fontsize=axis_size)
+        else:
+            pl.xlabel(xlabel)
+
+    if ylabel is not None:
+        if axis_font is not None:
+            if axis_size is not None:
+                pl.ylabel(ylabel, fontname=axis_font, fontsize=axis_size)
+            else:
+                pl.ylabel(ylabel, fontname=axis_font)
+        elif axis_size is not None:
+            pl.ylabel(xlabel, fontsize=axis_size)
+        else:
+            pl.ylabel(xlabel)
+
+    if title is not None:
+        if title_font is not None:
+            if title_size is not None:
+                pl.title(title, fontname=title_font, fontsize=title_size)
+            else:
+                pl.title(title, fontname=title_font)
+        elif title_size is not None:
+            pl.title(title, fontsize=title_size)
+        else:
+            pl.title(title)
+
+    if legend is not None:
+        if legend_size is not None:
+            pl.legend(legend, fontsize=legend_size)
+        else:
+            pl.legend(legend)
+    pl.show()
+
 
 def semilogx2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=None, xlim=None, ylim=None, axis_font=None, axis_size=None, title_font=None, title_size=None, legend_size=None, grid=None, grid_axis='both', grid_color=None, grid_linestyle='-', grid_linewidth=None, grid_transparency=1):
     plot_args = {}
