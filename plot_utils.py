@@ -71,8 +71,6 @@ def plot2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=None,
             pl.legend(legend)
     pl.show()
 
-   # THIS IS STILL JUST COPIED FROM NORMAL PLOT2D FUNCTION, NEEDS TO BE CHANGED TO CONTOUR PLOT
-
 
 def plot2d_contour(x, y, Z, contour=True, levels=20, cmap='viridis', xlabel=None, ylabel=None, title=None, legend=None, xlim=None, ylim=None, axis_font=None, axis_size=None, title_font=None, title_size=None, legend_size=None, grid=None, grid_axis='both', grid_color=None, grid_linestyle='-', grid_linewidth=None, grid_transparency=1):
     X, Y = np.meshgrid(x, y)
