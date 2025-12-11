@@ -73,11 +73,21 @@ def plot2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=None,
 
 
 def plot2d_contour(x, y, Z, contour=True, levels=20, cmap='viridis', xlabel=None, ylabel=None, title=None, legend=None, xlim=None, ylim=None, axis_font=None, axis_size=None, title_font=None, title_size=None, legend_size=None, grid=None, grid_axis='both', grid_color=None, grid_linestyle='-', grid_linewidth=None, grid_transparency=1):
-    X, Y = np.meshgrid(x, y)
-    if contour:
-        cs = pl.contourf(X, Y, Z, levels=levels, cmap=cmap)
+    # Check if Z is 1D (scattered data) or 2D (grid data)
+    if Z.ndim == 1:
+        if contour:
+            cs = pl.tricontourf(x, y, Z, levels=levels, cmap=cmap)
+        else:
+            # For 1D data, pcolormesh won't work easily;
+            # we use tricontourf or a scatter plot
+            cs = pl.scatter(x, y, c=Z, cmap=cmap)
     else:
-        cs = pl.pcolormesh(X, Y, Z, shading='auto', cmap=cmap)
+        # Your existing code for 2D grids
+        X, Y = np.meshgrid(x, y)
+        if contour:
+            cs = pl.contourf(X, Y, Z, levels=levels, cmap=cmap)
+        else:
+            cs = pl.pcolormesh(X, Y, Z, shading='auto', cmap=cmap)
     pl.colorbar(cs)
 
     if xlim is not None:

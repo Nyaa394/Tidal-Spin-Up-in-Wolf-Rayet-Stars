@@ -43,6 +43,7 @@ def gw_frequency(a, m1, m2):
 
 # separation from gravitational wave frequency
 
+
 def separation_from_gw_frequency(f, m1, m2):
     import numpy as np
     G = 6.674e-11  # N*m^2/Kg^2
