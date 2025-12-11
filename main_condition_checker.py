@@ -87,7 +87,7 @@ with open("possible_output.csv", "w", newline="") as f:
                                             f[-1], m1, m2)
 
                                         if f[-1] <= 2*fmin:
-                                            # maybe add condition about final timescalre and/or final a
+                                            # maybe add condition about final timescale and/or final a
 
                                             if a_spin >= 0.38:
                                                 sol_id = f"sol_{counter:05d}"
