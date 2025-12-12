@@ -1,5 +1,3 @@
-# find m1, m2, a0, k/Q so that Omegafinal >= 0.1*f_orb which is f/2 at tfinal (m1 is mass of main star, m2 mass of companion)
-
 # important libs and constants
 import plot_utils as p
 import functions as fct
