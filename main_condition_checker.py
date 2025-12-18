@@ -14,7 +14,7 @@ c = 299792458.0  # m/s
 counter = 0
 
 # Open the outputfile once, before loops
-with open("possible_output.csv", "w", newline="") as f:
+with open("possible_output1.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
     writer.writerow(["ID", "m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
