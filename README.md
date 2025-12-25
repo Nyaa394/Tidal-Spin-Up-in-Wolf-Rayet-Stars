@@ -7,3 +7,4 @@ The purpose of this project is to verify different conditions to see under which
 - main_condition_checker is intended to output a csv file with all initial data that fullfils the condition(s) currently being verified.<br>
 - main_eq_plots serves as a direct plotter of the data provided by main_condition_checker. <br>
 - main_worksheet_population_study and main_worksheet_BH_binary are the subsequent tasks of the worksheet, which focus on the dimentionless spin parameter and the effective spin.<br>
+- the newer files (all_ok, freq_ok, wtf, not_ok_but_maybe_check) are all files in which I will work on each specific case. <br>
