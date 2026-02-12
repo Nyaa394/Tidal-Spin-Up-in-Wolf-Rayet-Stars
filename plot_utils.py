@@ -32,6 +32,9 @@ def plot2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=None,
     pl.xlabel(xlabel, fontproperties=axis_font, fontsize=axis_size)
     pl.ylabel(ylabel, fontproperties=axis_font, fontsize=axis_size)
 
+    pl.xticks(fontproperties=axis_font, fontsize=axis_size)
+    pl.yticks(fontproperties=axis_font, fontsize=axis_size)
+
     pl.title(title, fontproperties=title_font, fontsize=title_size)
     
     pl.legend(legend, fontsize=legend_size) if legend else None
@@ -75,6 +78,9 @@ def plot2d_contour(x, y, Z, contour=True, levels=20, cmap='viridis', xlabel=None
     pl.xlabel(xlabel, fontproperties=axis_font, fontsize=axis_size)
     pl.ylabel(ylabel, fontproperties=axis_font, fontsize=axis_size)
 
+    pl.xticks(fontproperties=axis_font, fontsize=axis_size)
+    pl.yticks(fontproperties=axis_font, fontsize=axis_size)
+
     pl.title(title, fontproperties=title_font, fontsize=title_size)
     
     pl.legend(legend, fontsize=legend_size) if legend else None
@@ -103,6 +109,9 @@ def semilogx2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=N
 
     pl.xlabel(xlabel, fontproperties=axis_font, fontsize=axis_size)
     pl.ylabel(ylabel, fontproperties=axis_font, fontsize=axis_size)
+
+    pl.xticks(fontproperties=axis_font, fontsize=axis_size)
+    pl.yticks(fontproperties=axis_font, fontsize=axis_size)
 
     pl.title(title, fontproperties=title_font, fontsize=title_size)
     
@@ -134,6 +143,9 @@ def semilogy2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=N
     pl.xlabel(xlabel, fontproperties=axis_font, fontsize=axis_size)
     pl.ylabel(ylabel, fontproperties=axis_font, fontsize=axis_size)
 
+    pl.xticks(fontproperties=axis_font, fontsize=axis_size)
+    pl.yticks(fontproperties=axis_font, fontsize=axis_size)
+
     pl.title(title, fontproperties=title_font, fontsize=title_size)
     
     pl.legend(legend, fontsize=legend_size) if legend else None
@@ -163,6 +175,9 @@ def loglog2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=Non
 
     pl.xlabel(xlabel, fontproperties=axis_font, fontsize=axis_size)
     pl.ylabel(ylabel, fontproperties=axis_font, fontsize=axis_size)
+
+    pl.xticks(fontproperties=axis_font, fontsize=axis_size)
+    pl.yticks(fontproperties=axis_font, fontsize=axis_size)
 
     pl.title(title, fontproperties=title_font, fontsize=title_size)
     
@@ -194,6 +209,9 @@ def scatter2d(x, y, xlabel=None, ylabel=None, title=None, legend=None, colour=No
                     
     pl.xlabel(xlabel, fontproperties=axis_font, fontsize=axis_size)
     pl.ylabel(ylabel, fontproperties=axis_font, fontsize=axis_size)
+
+    pl.xticks(fontproperties=axis_font, fontsize=axis_size)
+    pl.yticks(fontproperties=axis_font, fontsize=axis_size)
 
     pl.title(title, fontproperties=title_font, fontsize=title_size)
     
