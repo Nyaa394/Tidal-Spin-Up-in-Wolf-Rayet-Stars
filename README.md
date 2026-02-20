@@ -8,4 +8,4 @@ The purpose of this project is to verify different conditions to see under which
 - main_eq_plots serves as a direct plotter of the data provided by main_condition_checker. <br>
 - main_worksheet_population_study and main_worksheet_BH_binary are the subsequent tasks of the worksheet, which focus on the dimentionless spin parameter and the effective spin.<br>
 - the newer files (all_ok, freq_ok, freq_ok_redo and their variants) are all files in which I will work on each specific case. <br>
-
+- PCA is self-explanatory <br>
