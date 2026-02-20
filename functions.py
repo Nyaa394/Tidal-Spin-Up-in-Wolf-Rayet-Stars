@@ -81,3 +81,94 @@ def median(f, x1, x2, *args):
 
 def effective_spin(q, a1, a2):
     return (a2 + q*a1)/(1+q)
+
+def pca(file_paths, target_col, feature_cols=None, n_components=2):
+
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+   
+    if isinstance(file_paths, list):
+        df = pd.concat([pd.read_csv(f) for f in file_paths], ignore_index=True)
+    else:
+        df = pd.read_csv(file_paths)
+
+    # Select the data we actually want
+    # If feature_cols isn't provided, default to all numeric columns minus target
+    if feature_cols is None:
+        features_df = df.select_dtypes(include=[np.number]).drop(columns=[target_col], errors='ignore')
+        feature_cols = features_df.columns.tolist()
+    else:
+        features_df = df[feature_cols]
+
+    # drop rows with NaNs
+    clean_df = features_df.join(df[target_col]).dropna()
+    features_final = clean_df[features_df.columns]
+    target_final = clean_df[target_col].values
+
+    # Scaling & PCA
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(features_final)
+    
+    pca = PCA(n_components=n_components)
+    pca_results = pca.fit_transform(scaled_data) 
+
+    # plots
+
+    # Scree Plot (Explained Variance)
+    # Shows the "elbow" to decide how many PCs are enough (how many get 90% is goal)
+
+    plt.figure()
+    components = np.arange(1, len(pca.explained_variance_ratio_) + 1)
+
+    plt.bar(components, pca.explained_variance_ratio_)
+    plt.xlabel("Principal Component")
+    plt.ylabel("Explained Variance Ratio")
+    plt.title("Scree Plot")
+    plt.xticks(components)
+    plt.grid(axis='y')
+    plt.show()
+
+    # PCA Contour Plot (PC1 vs PC2 vs Target)
+    plt.figure()
+    scatter = plt.scatter(
+        pca_results[:, 0],
+        pca_results[:, 1],
+        c=target_final,
+        cmap='plasma'
+    )
+
+    plt.xlabel("Principal Component 1")
+    plt.ylabel("Principal Component 2")
+    plt.title(f"PCA Scatter (Target: {target_col})")
+    plt.colorbar(scatter, label=target_col)
+    plt.grid(True)
+    plt.show()
+
+    # Loadings Plot
+    # Shows which original variables "pull" the data in certain directions
+    loadings = pca.components_.T
+    plt.figure()
+
+    # Draw axes crossing at origin
+    plt.axhline(0)
+    plt.axvline(0)
+
+    plt.scatter(loadings[:, 0], loadings[:, 1])
+
+    # Label each feature
+    for i, feature in enumerate(feature_cols):
+        plt.text(loadings[i, 0], loadings[i, 1], feature)
+
+    plt.xlabel("PC1 Loadings")
+    plt.ylabel("PC2 Loadings")
+    plt.title("Feature Loadings Plot")
+    plt.grid(True)
+    plt.show()
+
+    # Print loadings numerically too
+    print("\n--- Feature Loadings Key ---")
+    for i, feature in enumerate(feature_cols):
+        print(f"{feature}: PC1={loadings[i, 0]:.3f}, PC2={loadings[i, 1]:.3f}")

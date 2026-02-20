@@ -6,7 +6,7 @@ import numpy as np
 import random
 import csv
 import os
-os.makedirs("solutions", exist_ok=True)
+os.makedirs("solutions_trial", exist_ok=True)
 G = 6.674e-11  # N*m^2/Kg^2
 Msolar = 1.989e30  # kg
 Rsolar = 6.957e8  # in m
@@ -14,7 +14,7 @@ c = 299792458.0  # m/s
 counter = 0
 
 # Open the outputfile once, before loops
-with open("possible_output1.csv", "w", newline="") as f:
+with open("possible_output_trial.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
     writer.writerow(["ID", "m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
@@ -56,10 +56,10 @@ with open("possible_output1.csv", "w", newline="") as f:
                                 T_TF = fct.tidal_friction_timescale(
                                     m1, m2, Q, k, a0, RWR1, f0)/(3600*24*365.25)
 
-                                if T_TF <= 10*lifetime:  # assume if it's bigger then it has no hope
+                                if T_TF <= 2*lifetime:  # assume if it's bigger then it has no hope (took 10 originally, 2 is bc it's either up to 1.6 or it's really nearly 10 so impossible)
 
                                     K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
-                                        ((G**(5/3))*m1*rg2*(m1+m2)**(5/3))
+                                        ((G**(5/3))*m1*(m1+m2)**(5/3))
                                     K2 = (3*k/Q)*((m2**2)*(np.pi**3)*(R1**3)) / \
                                         (G*m1*rg2*(m1+m2)**2)
 
@@ -68,10 +68,14 @@ with open("possible_output1.csv", "w", newline="") as f:
 
                                     def dOmegadt(f, Omega):
                                         return K2*(f**3)*(f/2-Omega)
+                                    
+                                    #t_scale = 3.1536e13  # 1 Myr in seconds
+                                    #x_scale = 1e-5       # 10 microHz in Hz
+                                    #y_scale = 1e-5       # 10 microHz in rad/s (for Omega)
 
                                     for Omega0 in [1e-5]:
                                         sols = odes.solve_Radau(
-                                            dxdt=dfdt, dydt=dOmegadt, x0=f0, y0=Omega0, t0=0, tfinal=tfinal, x_scale=1, y_scale=1, t_scale=1)
+                                            dxdt=dfdt, dydt=dOmegadt, x0=f0, y0=Omega0, t0=0, tfinal=tfinal, x_scale=1e-5, y_scale=1e-5, t_scale=3.1536e13)
 
                                         # in years
                                         t = sols[0]/(3600*24*365.25)
@@ -85,14 +89,15 @@ with open("possible_output1.csv", "w", newline="") as f:
                                             f[-1], m1, m2)
 
                                         if f[-1] <= 2*fmin:
-                                            # maybe add condition about final timescale and/or final a
+                                            # checking if mass transfer starts but it hasn't for any of the cases I got after correcting the K1 expression
 
-                                            if a_spin >= 0.38:
+                                            if a_spin >= 0.3:
                                                 sol_id = f"sol_{counter:05d}"
                                                 np.savez(
-                                                    f"solutions/{sol_id}.npz", t=t, f=f, Omega=Omega)
+                                                    f"solutions_trial/{sol_id}.npz", t=t, f=f, Omega=Omega)
                                                 counter += 1
 
                                                 # Write one row for this iteration
                                                 writer.writerow(
                                                     [sol_id, m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, f0, f[-1], fmin, Omega[-1], J, a_spin, a_final, a_min_si])
+                                            
