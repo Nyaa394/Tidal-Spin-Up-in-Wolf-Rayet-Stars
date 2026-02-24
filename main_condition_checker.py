@@ -6,7 +6,7 @@ import numpy as np
 import random
 import csv
 import os
-os.makedirs("solutions_trial", exist_ok=True)
+os.makedirs("solutions_mid_2", exist_ok=True)
 G = 6.674e-11  # N*m^2/Kg^2
 Msolar = 1.989e30  # kg
 Rsolar = 6.957e8  # in m
@@ -14,7 +14,7 @@ c = 299792458.0  # m/s
 counter = 0
 
 # Open the outputfile once, before loops
-with open("possible_output_trial.csv", "w", newline="") as f:
+with open("possible_output_mid_2.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
     writer.writerow(["ID", "m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
@@ -56,7 +56,7 @@ with open("possible_output_trial.csv", "w", newline="") as f:
                                 T_TF = fct.tidal_friction_timescale(
                                     m1, m2, Q, k, a0, RWR1, f0)/(3600*24*365.25)
 
-                                if T_TF <= 2*lifetime:  # assume if it's bigger then it has no hope (took 10 originally, 2 is bc it's either up to 1.6 or it's really nearly 10 so impossible)
+                                if T_TF <= lifetime:  # assume if it's bigger then it has no hope (took 10 originally, 2 is bc it's either up to 1.6 or it's really nearly 10 so impossible)
 
                                     K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
                                         ((G**(5/3))*m1*(m1+m2)**(5/3))
@@ -91,10 +91,10 @@ with open("possible_output_trial.csv", "w", newline="") as f:
                                         if f[-1] <= 2*fmin:
                                             # checking if mass transfer starts but it hasn't for any of the cases I got after correcting the K1 expression
 
-                                            if a_spin >= 0.3:
+                                            if a_spin >= 0.1 and a_spin < 0.3:
                                                 sol_id = f"sol_{counter:05d}"
                                                 np.savez(
-                                                    f"solutions_trial/{sol_id}.npz", t=t, f=f, Omega=Omega)
+                                                    f"solutions_mid_2/{sol_id}.npz", t=t, f=f, Omega=Omega)
                                                 counter += 1
 
                                                 # Write one row for this iteration
