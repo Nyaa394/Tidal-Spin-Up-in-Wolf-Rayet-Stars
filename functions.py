@@ -174,6 +174,7 @@ def pca(df, target_col, feature_cols=None, n_components=2):
 
 def pca_old(file_paths, target_col, feature_cols=None, n_components=2):
 
+
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
@@ -262,3 +263,36 @@ def pca_old(file_paths, target_col, feature_cols=None, n_components=2):
     print("\n--- Feature Loadings Key ---")
     for i, feature in enumerate(feature_cols):
         print(f"{feature}: PC1={loadings[i, 0]:.3f}, PC2={loadings[i, 1]:.3f}")
+
+def sample_from_csv(csv_filepath, num_samples):
+    """Reads a digitized distribution from a CSV and returns sampled masses."""
+
+    import numpy as np
+    import pandas as pd
+    from scipy.interpolate import interp1d
+    
+    # Load the data. header=None tells pandas there are no title rows.
+    data = pd.read_csv(csv_filepath, header=None)
+    
+    # Extract x (for ex masses) and y (rates). 
+    x_pts = data[0].values
+    y_pts = data[2].values
+    
+    # Create the interpolation function
+    dist_func = interp1d(x_pts, y_pts, kind='cubic', fill_value="inside")
+    
+    # Create grid for sampling
+    sample_grid = np.linspace(x_pts.min(), x_pts.max(), 1000)
+    probabilities = dist_func(sample_grid)
+    
+    # IMPORTANT: no negative values from cubic interpolation
+    probabilities = np.clip(probabilities, 0, None)
+    
+    # Normalize the probabilities so they sum to 1.0 (creating a PDF)
+    pdf = probabilities / probabilities.sum()
+    
+    # Sample what i need
+    sample = np.random.choice(sample_grid, size=num_samples, p=pdf)
+    
+    # Return as a standard python list so it matches your original format seamlessly
+    return sample.tolist()
