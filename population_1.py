@@ -13,6 +13,7 @@ Msolar = 1.989e30  # kg
 Rsolar = 6.957e8  # in m
 c = 299792458.0  # m/s
 counter = 0
+AU = 149597870700 # in m
 
 # Open the outputfile once, before loops
 with open("possible_output_pop_1.csv", "w", newline="") as f:
@@ -51,7 +52,7 @@ with open("possible_output_pop_1.csv", "w", newline="") as f:
                             tfinal = lifetime*365.25*24*3600  # time in s
 
                             # checking timescales compared to lifetime, timescale has to be shorter for tides to have time to act
-                            for a0 in [10**a * Rsolar for a in fct.sample_from_csv('Separation.csv', 20)]:
+                            for a0 in [10**a * AU for a in fct.sample_from_csv('Separation.csv', 20)]:
                                 if a0 <= a_max:
                                     f0 = fct.gw_frequency(a0, m1, m2)
 
@@ -93,7 +94,7 @@ with open("possible_output_pop_1.csv", "w", newline="") as f:
 
                                             sol_id = f"sol_{counter:05d}"
                                             np.savez(
-                                                f"solutions_mid_2/{sol_id}.npz", t=t, f=f, Omega=Omega)
+                                                f"sol_pop_1/{sol_id}.npz", t=t, f=f, Omega=Omega)
                                             counter += 1
 
                                             # Write one row for this iteration

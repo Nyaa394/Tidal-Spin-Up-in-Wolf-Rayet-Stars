@@ -275,8 +275,13 @@ def sample_from_csv(csv_filepath, num_samples):
     data = pd.read_csv(csv_filepath, header=None)
     
     # Extract x (for ex masses) and y (rates). 
-    x_pts = data[0].values
-    y_pts = data[2].values
+    x_raw = data.iloc[:, 0].values   # The very first column
+    y_raw = data.iloc[:, -1].values  # The very last column
+
+    # np.unique sorts the X values and removes any exact duplicates.
+    # return_index=True grabs the matching Y values for those unique X's.
+    x_pts, unique_indices = np.unique(x_raw, return_index=True)
+    y_pts = y_raw[unique_indices]
     
     # Create the interpolation function
     dist_func = interp1d(x_pts, y_pts, kind='cubic', fill_value="inside")
