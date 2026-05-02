@@ -5,6 +5,12 @@ def max_separation(timescale, m1, m2):
     c = 299792458.0  # m/s
     return ((256/5)*(timescale*365.25*24*3600)*(G**3)*(m1*m2*(m1+m2))/(c**5))**(1/4)
 
+def gw_timescale(a, m1, m2):
+    import numpy as np
+    G = 6.674e-11  # N*m^2/Kg^2
+    c = 299792458.0  # m/s
+    return ((5/256)*(c**5)*(a**4)/((G**3)*(m1*m2*(m1+m2))))/(365.25*24*3600)
+
 # find orbital period
 
 
@@ -48,6 +54,7 @@ def separation_from_gw_frequency(f, m1, m2):
     import numpy as np
     G = 6.674e-11  # N*m^2/Kg^2
     return ((G*(m1+m2))/(np.pi**2*f**2))**(1/3)  # in m
+
 
 # tidal friction timescale + integrable version for quad
 

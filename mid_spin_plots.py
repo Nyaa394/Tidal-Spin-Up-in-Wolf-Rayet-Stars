@@ -6,29 +6,27 @@ import numpy as np
 import random
 import csv
 import os
-
-os.makedirs("sol_pop_1", exist_ok=True)
+os.makedirs("mid_spin_sols", exist_ok=True)
 G = 6.674e-11  # N*m^2/Kg^2
 Msolar = 1.989e30  # kg
 Rsolar = 6.957e8  # in m
 c = 299792458.0  # m/s
 counter = 0
-AU = 149597870700 # in m
 
 # Open the outputfile once, before loops
-with open("possible_output_pop_1.csv", "w", newline="") as f:
+with open("mid_spin_data.csv", "w", newline="") as f:
     writer = csv.writer(f)
     # Write the header only once
     writer.writerow(["ID", "m_WR/M_Sun", "m_companion/M_Sun", "k", 'Q', 'initial separation a0 (m)', 'WR star Radius R_WR', 'R_WR/a0', 'initial spin Omega0 (Hz)', 'lifetime (years)',
                      'tidal function timescale (years)', "gw timescale (years)", 'initial frequency f0 (Hz)', 'f_final (Hz)', 'f_min (Hz)', 'Omega_final (Hz)', 'final angular momentum J (kg m^2/s)', 'spin parameter a_spin', 'final separation a_final (m)', 'minimum separation a_min (m)'])
 
     # shit just got real
-    for m1 in [m * Msolar for m in fct.sample_from_csv('Mass.csv', 50)]:
-        for m2 in [m * Msolar for m in fct.sample_from_csv('Mass.csv', 50)]:
+    for m1 in [random.uniform(10*Msolar, 100*Msolar) for _ in range(100)]:
+        for m2 in [random.uniform(20*Msolar, 100*Msolar) for _ in range(100)]:
             for rg2 in [0.1]:
                 for k in [0.001]:
                     for Q in [1e4, 1e5, 1e6, 1e7]:
-                        for lifetime in [1e6]:
+                        for lifetime in [1000, 5000, 10000, 1e5, 1e6]:
                             q = m1/m2
 
                             RWR1 = fct.radius_from_mass(
@@ -52,7 +50,7 @@ with open("possible_output_pop_1.csv", "w", newline="") as f:
                             tfinal = lifetime*365.25*24*3600  # time in s
 
                             # checking timescales compared to lifetime, timescale has to be shorter for tides to have time to act
-                            for a0 in [10**a * AU for a in fct.sample_from_csv('Separation.csv', 20)]:
+                            for a0 in [2*a_min_si, 3*a_min_si, 4*a_min_si, 5*a_min_si]:
                                 if a0 <= a_max:
                                     f0 = fct.gw_frequency(a0, m1, m2)
 
@@ -60,9 +58,9 @@ with open("possible_output_pop_1.csv", "w", newline="") as f:
 
                                     T_TF = fct.tidal_friction_timescale(
                                         m1, m2, Q, k, a0, RWR1, f0)/(3600*24*365.25)
-                                    
-                                    if T_TF <= 100*lifetime:  # assume if it's bigger then it has no hope 
 
+                                    if T_TF <= 100*lifetime:  # assume if it's bigger then it has no hope
+                                        
                                         K1 = (18*k/Q)*(m2*(np.pi**(13/3))*(R1**5)) / \
                                             ((G**(5/3))*m1*(m1+m2)**(5/3))
                                         K2 = (3*k/Q)*((m2**2)*(np.pi**3)*(R1**3)) / \
@@ -80,7 +78,7 @@ with open("possible_output_pop_1.csv", "w", newline="") as f:
 
                                         for Omega0 in [1e-5]:
                                             sols = odes.solve_Radau(
-                                                dxdt=dfdt, dydt=dOmegadt, x0=f0, y0=Omega0, t0=0, tfinal=tfinal, x_scale=1e-5, y_scale=1e-5, t_scale=tfinal)
+                                                dxdt=dfdt, dydt=dOmegadt, x0=f0, y0=Omega0, t0=0, tfinal=tfinal, x_scale=1e-5, y_scale=1e-5, t_scale = tfinal)
 
                                             # in years
                                             t = sols[0]/(3600*24*365.25)
@@ -96,12 +94,13 @@ with open("possible_output_pop_1.csv", "w", newline="") as f:
                                             if f[-1] <= 2*fmin:
                                                 # checking if mass transfer starts but it hasn't for any of the cases I got after correcting the K1 expression
 
-                                                sol_id = f"sol_{counter:05d}"
-                                                np.savez(
-                                                    f"sol_pop_1/{sol_id}.npz", t=t, f=f, Omega=Omega)
-                                                counter += 1
+                                                if a_spin >= 0.3:
+                                                    sol_id = f"sol_{counter:05d}"
+                                                    np.savez(
+                                                        f"high_spin_sols/{sol_id}.npz", t=t, f=f, Omega=Omega)
+                                                    counter += 1
 
-                                                # Write one row for this iteration
-                                                writer.writerow(
-                                                    [sol_id, m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, T_GW, f0, f[-1], fmin, Omega[-1], J, a_spin, a_final, a_min_si])
+                                                    # Write one row for this iteration
+                                                    writer.writerow(
+                                                        [sol_id, m1/Msolar, m2/Msolar, k, Q, a0, R1, R1/a0, Omega0, lifetime, T_TF, T_GW, f0, f[-1], fmin, Omega[-1], J, a_spin, a_final, a_min_si])
                                                 
