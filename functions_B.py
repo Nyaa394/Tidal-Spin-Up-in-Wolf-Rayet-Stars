@@ -1,0 +1,363 @@
+# find separation a for which no mass transfer (timescale=hubble time)
+# NEW and a is now semimajor axis
+
+def max_separation(timescale, m1, m2, e0):
+    from scipy.integrate import quad
+    G = 6.674e-11  # N*m^2/Kg^2
+    c = 299792458.0  # m/s
+    timescale_sec = timescale * 365.25 * 24 * 3600
+    
+    # Handle the circular edge-case to avoid division by zero from e0
+    if e0 == 0:
+        return ((256/5)*timescale_sec*(G**3)*(m1*m2*(m1+m2))/(c**5))**(1/4)
+        
+    # Circular case separation
+    a_circular = ((256/5)*timescale_sec*(G**3)*(m1*m2*(m1+m2))/(c**5))**(1/4)
+    
+    # Compute (c0^4 / a0^4)
+    c0_over_a0_pow4 = ((1 - e0**2) / (e0**(12/19)) * (1 + (121/304)*e0**2)**(-870/2299))**4
+    
+    # Compute the integral only (integrated over de from 0 to e0)
+    integrand = lambda e: (e**(29/19) * (1 + (121/304)*e**2)**(1181/2299)) / (1 - e**2)**1.5
+    integral_val, _ = quad(integrand, 0, e0)
+    
+    # Final a_max calculation
+    a_max = a_circular / ((15/304) * (256/5) * c0_over_a0_pow4 * integral_val)**(1/4)
+    
+    return a_max
+
+# timescale in years, functions turns it to s, a is in m, m1 and m2 in kg
+# NEW and a is now semimajor axis
+
+def gw_timescale(a0, m1, m2, e0):
+    from scipy.integrate import quad
+    G = 6.674e-11  # N*m^2/Kg^2
+    c = 299792458.0  # m/s
+    
+    # Handle the circular edge-case to avoid division by zero from e0
+    if e0 == 0:
+        T_circular = ((5/256)*(c**5)*(a0**4)/((G**3)*(m1*m2*(m1+m2))))
+        return T_circular / (365.25 * 24 * 3600)
+        
+    # Circular case (in seconds)
+    T_circular = ((5/256)*(c**5)*(a0**4)/((G**3)*(m1*m2*(m1+m2))))
+    
+    # Compute (c0^4 / a0^4)
+    c0_over_a0_pow4 = ((1 - e0**2) / (e0**(12/19)) * (1 + (121/304)*e0**2)**(-870/2299))**4
+    
+    # Compute the integral only (integrated over de from 0 to e0)
+    integrand = lambda e: (e**(29/19) * (1 + (121/304)*e**2)**(1181/2299)) / (1 - e**2)**1.5
+    integral_val, _ = quad(integrand, 0, e0)
+    
+    # Final T calculation (in seconds)
+    T_seconds = (15/304) * (256/5) * T_circular * c0_over_a0_pow4 * integral_val
+    
+    # Return timescale converted to years
+    return T_seconds / (365.25 * 24 * 3600)
+
+
+# gravitational wave frequency
+# NEW and a is now semimajor axis
+    
+def gw_frequency(a, m1, m2, e):
+    import numpy as np
+    G = 6.674e-11  # N*m^2/Kg^2
+    return ((1/np.pi)*((G*(m1+m2))/(a**3))**(1/2)) * (((1 + e)**1.195) / ((1 - e**2)**1.5)) #in Hz
+
+# find orbital frequency
+# NEW and a is now semimajor axis
+
+def orb_frequency(a, m1, m2):
+    import numpy as np
+    G = 6.674e-11  # N*m^2/Kg^2
+    return (1/(2*np.pi))*((G*(m1+m2))/(a**3))**(1/2)  # in Hz
+
+#find orbital period
+# SAME but a is now semimajor axis
+
+def orbital_period(a, m1, m2):
+    import numpy as np
+    G = 6.674e-11  # N*m^2/Kg^2
+    return 2*np.pi*((a**3)/(G*(m1+m2)))**(1/2)
+
+# find mass from radius
+# SAME
+
+def mass_from_radius(R):
+    return (R/0.2276)**(1/0.57)  # R in solar radii, m in solar masses
+
+# find radius from mass
+# SAME
+
+def radius_from_mass(m):
+    return 0.2276*(m**0.57)  # R in solar radii, m in solar masses
+
+# find minimum separation for stars to be detached
+#NEW and a is now semimajor axis  # in solar radii (both R and a_min)
+
+def min_separation(q, R, e):
+    import numpy as np
+    numerator = R * (0.6 * q**(2/3) + np.log(1 + q**(1/3)))
+    denominator = 0.49 * q**(2/3) * (1 - e)
+    return numerator / denominator
+
+
+# separation from gravitational wave frequency NO LONGER NEED since i'll be evolving the separation directly.
+
+#def separation_from_gw_frequency(f, m1, m2):
+#    import numpy as np
+#    G = 6.674e-11  # N*m^2/Kg^2
+#    return ((G*(m1+m2))/(np.pi**2*f**2))**(1/3)  # in m
+
+
+# tidal friction timescale + integrable version for quad 
+# SAME but a is now semimajor axis and (pi f)-1 should become (2pi forb)-1
+def tidal_friction_timescale(m1, m2, Q, k, a, R, f_orb):
+    Rsolar = 6.957e8  # in m
+    import numpy as np
+    return (1/6)*(m1/m2)*(Q/k)*((a/(R*Rsolar))**5)*(2*np.pi*f_orb)**(-1)
+
+
+def tidal_friction_timescale_integrable(x, m1, m2, a, R, f):
+    Rsolar = 6.957e8  # in m
+    import numpy as np
+    return (1/6)*(m1/m2)*(1/x)*((a/(R*Rsolar))**5)*(np.pi*f)**(-1)
+
+# mean and median of a function f between x1 and x2
+
+
+#def mean(f, x1, x2, *args):
+#    from scipy.integrate import quad
+#    return (1/(x2-x1))*quad(f, x1, x2, args=args)[0]
+
+
+#def median(f, x1, x2, *args):
+#    from scipy.integrate import quad
+#    from scipy.optimize import root_scalar
+#    return root_scalar(lambda m: 0.5*quad(f, x1, x2, args=args)[0]-quad(f, x1, m, args=args)[0], bracket=[x1, x2]).root
+
+# effective spin vs q=mWR/mBH, q<1, using spin parameters a2 of the initial BH (a1 on worksheet), and a1 of BH from WR star (a2 on worksheet)
+
+
+#def effective_spin(q, a1, a2):
+#    return (a2 + q*a1)/(1+q)
+
+
+def pca(df, target_col, feature_cols=None, n_components=2):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+   
+    # removed the pd.read_csv logic so the function now expects a DataFrame
+
+    # Select the data we actually want
+    if feature_cols is None:
+        features_df = df.select_dtypes(include=[np.number]).drop(columns=[target_col], errors='ignore')
+        feature_cols = features_df.columns.tolist()
+    else:
+        features_df = df[feature_cols]
+
+    # drop rows with NaNs
+    clean_df = features_df.join(df[target_col]).dropna()
+    features_final = clean_df[features_df.columns]
+    target_final = clean_df[target_col].values
+
+    # Scaling & PCA
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(features_final)
+    
+    pca = PCA(n_components=n_components)
+    pca_results = pca.fit_transform(scaled_data) 
+
+    # plots
+
+    # Scree Plot (Explained Variance)
+    # Shows the "elbow" to decide how many PCs are enough (how many get 90% is goal)
+
+    plt.figure()
+    components = np.arange(1, len(pca.explained_variance_ratio_) + 1)
+
+    plt.bar(components, pca.explained_variance_ratio_)
+    plt.xlabel("Principal Component")
+    plt.ylabel("Explained Variance Ratio")
+    plt.title("Scree Plot")
+    plt.xticks(components)
+    plt.grid(axis='y')
+    plt.show()
+
+    # PCA Contour Plot (PC1 vs PC2 vs Target)
+    plt.figure()
+    scatter = plt.scatter(
+        pca_results[:, 0],
+        pca_results[:, 1],
+        c=target_final,
+        cmap='plasma'
+    )
+
+    plt.xlabel("Principal Component 1")
+    plt.ylabel("Principal Component 2")
+    plt.title(f"PCA Scatter (Target: {target_col})")
+    plt.colorbar(scatter, label=target_col)
+    plt.grid(True)
+    plt.show()
+
+    # Loadings Plot
+    # Shows which original variables "pull" the data in certain directions
+    loadings = pca.components_.T
+    plt.figure()
+
+    # Draw axes crossing at origin
+    plt.axhline(0)
+    plt.axvline(0)
+
+    plt.scatter(loadings[:, 0], loadings[:, 1])
+
+    # Label each feature
+    for i, feature in enumerate(feature_cols):
+        plt.text(loadings[i, 0], loadings[i, 1], feature)
+
+    plt.xlabel("PC1 Loadings")
+    plt.ylabel("PC2 Loadings")
+    plt.title("Feature Loadings Plot")
+    plt.grid(True)
+    plt.show()
+
+    # Print loadings numerically too
+    print("\n--- Feature Loadings Key ---")
+    for i, feature in enumerate(feature_cols):
+        print(f"{feature}: PC1={loadings[i, 0]:.3f}, PC2={loadings[i, 1]:.3f}")
+
+    
+
+#will keep here, this one does pca on columns from csv files it reads
+
+def pca_old(file_paths, target_col, feature_cols=None, n_components=2):
+
+
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+   
+    if isinstance(file_paths, list):
+        df = pd.concat([pd.read_csv(f) for f in file_paths], ignore_index=True)
+    else:
+        df = pd.read_csv(file_paths)
+
+    # Select the data we actually want
+    # If feature_cols isn't provided, default to all numeric columns minus target
+    if feature_cols is None:
+        features_df = df.select_dtypes(include=[np.number]).drop(columns=[target_col], errors='ignore')
+        feature_cols = features_df.columns.tolist()
+    else:
+        features_df = df[feature_cols]
+
+    # drop rows with NaNs
+    clean_df = features_df.join(df[target_col]).dropna()
+    features_final = clean_df[features_df.columns]
+    target_final = clean_df[target_col].values
+
+    # Scaling & PCA
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(features_final)
+    
+    pca = PCA(n_components=n_components)
+    pca_results = pca.fit_transform(scaled_data) 
+
+    # plots
+
+    # Scree Plot (Explained Variance)
+    # Shows the "elbow" to decide how many PCs are enough (how many get 90% is goal)
+
+    plt.figure()
+    components = np.arange(1, len(pca.explained_variance_ratio_) + 1)
+
+    plt.bar(components, pca.explained_variance_ratio_)
+    plt.xlabel("Principal Component")
+    plt.ylabel("Explained Variance Ratio")
+    plt.title("Scree Plot")
+    plt.xticks(components)
+    plt.grid(axis='y')
+    plt.show()
+
+    # PCA Contour Plot (PC1 vs PC2 vs Target)
+    plt.figure()
+    scatter = plt.scatter(
+        pca_results[:, 0],
+        pca_results[:, 1],
+        c=target_final,
+        cmap='plasma'
+    )
+
+    plt.xlabel("Principal Component 1")
+    plt.ylabel("Principal Component 2")
+    plt.title(f"PCA Scatter (Target: {target_col})")
+    plt.colorbar(scatter, label=target_col)
+    plt.grid(True)
+    plt.show()
+
+    # Loadings Plot
+    # Shows which original variables "pull" the data in certain directions
+    loadings = pca.components_.T
+    plt.figure()
+
+    # Draw axes crossing at origin
+    plt.axhline(0)
+    plt.axvline(0)
+
+    plt.scatter(loadings[:, 0], loadings[:, 1])
+
+    # Label each feature
+    for i, feature in enumerate(feature_cols):
+        plt.text(loadings[i, 0], loadings[i, 1], feature)
+
+    plt.xlabel("PC1 Loadings")
+    plt.ylabel("PC2 Loadings")
+    plt.title("Feature Loadings Plot")
+    plt.grid(True)
+    plt.show()
+
+    # Print loadings numerically too
+    print("\n--- Feature Loadings Key ---")
+    for i, feature in enumerate(feature_cols):
+        print(f"{feature}: PC1={loadings[i, 0]:.3f}, PC2={loadings[i, 1]:.3f}")
+
+def sample_from_csv(csv_filepath, num_samples):
+    """Reads a digitized distribution from a CSV and returns sampled masses."""
+
+    import numpy as np
+    import pandas as pd
+    from scipy.interpolate import interp1d
+    
+    # Load the data. header=None tells pandas there are no title rows.
+    data = pd.read_csv(csv_filepath, header=None)
+    
+    # Extract x (for ex masses) and y (rates). 
+    x_raw = data.iloc[:, 0].values   # The very first column
+    y_raw = data.iloc[:, -1].values  # The very last column
+
+    # np.unique sorts the X values and removes any exact duplicates.
+    # return_index=True grabs the matching Y values for those unique X's.
+    x_pts, unique_indices = np.unique(x_raw, return_index=True)
+    y_pts = y_raw[unique_indices]
+    
+    # Create the interpolation function
+    dist_func = interp1d(x_pts, y_pts, kind='cubic', fill_value="inside")
+    
+    # Create grid for sampling
+    sample_grid = np.linspace(x_pts.min(), x_pts.max(), 1000)
+    probabilities = dist_func(sample_grid)
+    
+    # IMPORTANT: no negative values from cubic interpolation
+    probabilities = np.clip(probabilities, 0, None)
+    
+    # Normalize the probabilities so they sum to 1.0 (creating a PDF)
+    pdf = probabilities / probabilities.sum()
+    
+    # Sample what i need
+    sample = np.random.choice(sample_grid, size=num_samples, p=pdf)
+    
+    # Return as a standard python list so it matches your original format seamlessly
+    return sample.tolist()

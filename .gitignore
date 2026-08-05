@@ -5,3 +5,6 @@ __pycache__/
 I AM INCAPABLE OF WRITING STUFF CORRECTLY/
 
 *.hdf5
+Mdot_plotting.ipynb
+*.json
+*.txt
